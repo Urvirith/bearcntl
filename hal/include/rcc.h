@@ -2,6 +2,7 @@
 #define RCC_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // RCC DRIVER
 // ARM RCC MODULE

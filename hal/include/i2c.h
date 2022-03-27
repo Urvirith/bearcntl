@@ -2,6 +2,7 @@
 #define I2C_H_
 
 #include "common.h"
+#include "pointer.h"
 
 /* Register Base */
 

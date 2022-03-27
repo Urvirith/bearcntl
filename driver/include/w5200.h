@@ -1,7 +1,7 @@
 #ifndef W5200_H_
 #define W5200_H_
 
-#include "hal/include/common.h"
+#include "common.h"
 
 /* 
     WIZNet W5200 Chipset

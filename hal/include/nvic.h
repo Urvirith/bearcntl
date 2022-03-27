@@ -2,6 +2,7 @@
 #define NVIC_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // NVIC DRIVER
 // ARM NVIC MODULE

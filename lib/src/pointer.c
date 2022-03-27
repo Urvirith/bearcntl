@@ -1,4 +1,4 @@
-#include "common.h"
+#include "pointer.h"
 
 /* Get a pointer bit in a u32 ptr Example value (10000 >> 5) -> 1 
    If passing a stuct pointer ie. GPIOB->ODR, you can pass by reference &GPIO->ODR */

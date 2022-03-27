@@ -2,6 +2,7 @@
 #define GPIO_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // GPIO DRIVER
 // ARM GPIO MODULE

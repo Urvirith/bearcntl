@@ -2,6 +2,7 @@
 #define USART_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // USART DRIVER
 // ARM USART MODULE

@@ -2,6 +2,7 @@
 #define TIMER_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // TIMER DRIVER
 // ARM TIMER MODULE - FREE RUNNING COUNTERS -32kHz or 25MHz

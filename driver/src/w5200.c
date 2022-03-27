@@ -1,4 +1,5 @@
 #include "w5200.h"
+#include "spi.h"
 
 /* WIZNET is MSB,
 

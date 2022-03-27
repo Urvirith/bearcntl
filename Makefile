@@ -30,6 +30,8 @@ OBJ_DIR	  	:= obj
 BIN_DIR	  	:= bin
 HAL_DIR   	:= hal
 BOARD_DIR   := board
+MAIN_DIR	:= main
+LIB_DIR		:= lib
 
 #ONLY ONE
 STARTUP		:= startup_stm32l552ze.s
@@ -37,14 +39,8 @@ STARTUP		:= startup_stm32l552ze.s
 #ONLY ONE
 LINKER		:= linker_stm32l552ze.ld
 
-OBJS 		:=	$(OBJ_DIR)/common.o \
-				$(OBJ_DIR)/gpio.o \
-				$(OBJ_DIR)/rcc.o \
-				$(OBJ_DIR)/timer.o \
-				$(OBJ_DIR)/usart.o \
-				$(OBJ_DIR)/spi.o \
-				$(OBJ_DIR)/nvic.o \
-				$(OBJ_DIR)/main.o
+OBJS 		:=	$(OBJ_DIR)/main.o \
+				$(OBJ_DIR)/pointer.o
 
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h
@@ -76,11 +72,11 @@ $(BIN_DIR)/main.elf: $(LINK_DIR)/$(LINKER) $(OBJS) $(BIN_DIR)/startup.o
 $(BIN_DIR)/startup.o: $(START_DIR)/$(STARTUP)
 	$(AS) $< $(ASFLAGS) -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
-	$(CC) $(CFLAGS) -c  $< -o $@
+$(OBJ_DIR)/%.o: $(MAIN_DIR)/$(SRC_DIR)/%.c
+	$(CC) -I $(MAIN_DIR)/$(INC_DIR) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
 
-$(OBJ_DIR)/%.o: $(HAL_DIR)/%.c $(HAL_DIR)/%.h $(HAL_DIR)/common.h
-	$(CC) -I $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(LIB_DIR)/$(SRC_DIR)/%.c
+	$(CC) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
 
 clean:
 	rm -f $(OBJ_DIR)/*.o
@@ -89,7 +85,7 @@ clean:
 	rm -f $(BIN_DIR)/*.bin
 
 flash:
-	STM32_Programmer_CLI -c port=SWD -w $(BLD_DIR)/main.bin 0x08000000
+	STM32_Programmer_CLI -c port=SWD -w $(BIN_DIR)/main.bin 0x08000000
 
 info:
 	STM32_Programmer_CLI -c port=SWD

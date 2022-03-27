@@ -1,7 +1,7 @@
 #ifndef L552ZE_H_
 #define L552ZE_H_
 
-#include "hal/include/common.h"
+#include "common.h"
 
 /* Notes */
 /* 1 Mhz = 1,000,000 CPS */

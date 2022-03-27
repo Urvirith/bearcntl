@@ -2,6 +2,7 @@
 #define SPI_H_
 
 #include "common.h"
+#include "pointer.h"
 
 // SPI DRIVER
 // ARM SPI MODULE
