@@ -4,13 +4,15 @@
 #include "common.h"
 #include "pointer.h"
 
-/* Register Base */
+// I2C DRIVER
+// ARM I2C MODULE
+// I2C Description - is on pg 1489
 
 #define ADDR_7_BIT_ACT      false
 #define ADDR_10_BIT_ACT     true
 
 
-/* Register Pointer Structure */
+/* Inter-Integrated Circuit (I2C) */
 typedef struct {
     volatile u32 CR1;       // Control Register 1
     volatile u32 CR2;       // Control Register 2

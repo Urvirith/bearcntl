@@ -1,3 +1,4 @@
+/* General Purpose I/O */
 #include "gpio.h"
 
 /* Register Masks */

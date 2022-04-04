@@ -9,8 +9,6 @@
 // SPI Description - is on pg 1699
 
 /* Serial Peripheral Interface */
-
-/* Register Pointer Structure */
 typedef struct {
     volatile u32 CR1;               // Control Register 1
     volatile u32 CR2;               // Control Register 2

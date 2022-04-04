@@ -32,6 +32,7 @@ HAL_DIR   	:= hal
 BOARD_DIR   := board
 MAIN_DIR	:= main
 LIB_DIR		:= lib
+HAL_DIR		:= hal
 
 #ONLY ONE
 STARTUP		:= startup_stm32l552ze.s
@@ -39,8 +40,8 @@ STARTUP		:= startup_stm32l552ze.s
 #ONLY ONE
 LINKER		:= linker_stm32l552ze.ld
 
-OBJS 		:=	$(OBJ_DIR)/main.o \
-				$(OBJ_DIR)/pointer.o
+OBJS 		:=	$(OBJ_DIR)/main.o 
+#$(OBJ_DIR)/pointer.o
 
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h
@@ -73,7 +74,7 @@ $(BIN_DIR)/startup.o: $(START_DIR)/$(STARTUP)
 	$(AS) $< $(ASFLAGS) -o $@
 
 $(OBJ_DIR)/%.o: $(MAIN_DIR)/$(SRC_DIR)/%.c
-	$(CC) -I $(MAIN_DIR)/$(INC_DIR) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
+	$(CC) -I $(MAIN_DIR)/$(INC_DIR) -I $(LIB_DIR)/$(INC_DIR) -I $(BOARD_DIR)/$(INC_DIR) -I $(HAL_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
 
 $(OBJ_DIR)/%.o: $(LIB_DIR)/$(SRC_DIR)/%.c
 	$(CC) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@

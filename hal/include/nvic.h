@@ -10,7 +10,6 @@
 // NVIC Registers (Programming Manual) - is on 178
 
 /* Nested vectored interrupt controller (NVIC) */
-
 typedef struct {
 	volatile u32   ISER[16];		// Interrupt Set-Enable register
 	volatile u32   Reserved0[16];	// Offset

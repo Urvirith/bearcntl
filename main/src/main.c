@@ -1,81 +1,39 @@
-// WORKING EXAMPLE FOR THE STM32L552ZE-Q NUCLEO
-// THIS WILL ACTIVATE AND DEACTIVE THE USER LEDS ON THE BOARD,
-// IT ALSO SHOWS HOW TO GET ACCESS TO REGISTERS, AND FORM VOLITILE POINTERS FOR USE LATER
-// VOLITILE TELLS THE COMPILER TO NOT OPTIMIZE THE MEMORY LOCATIONS 
-
+/* Main Entry Of Program */
 #include "main.h"
 
-#define PORTC_PIN7          (u32)7                                          /* USER GREEN LED on GPIO A Bus, Pin 5  */
-#define LED_GRN             PORTC_PIN7                                      /* USER GREEN LED on GPIO A Bus, Pin 5  */
-#define PORTB_PIN7          (u32)7                                          /* USER BLUE LED on GPIO B Bus, Pin 7   */
-#define LED_BLU             PORTB_PIN7                                      /* USER BLUE LED on GPIO B Bus, Pin 7   */
-#define PORTA_PIN9          (u32)9                                          /* USER RED LED on GPIO 9 Bus, Pin 9    */
-#define LED_RED             PORTA_PIN9                                      /* USER RED LED on GPIO 9 Bus, Pin 9    */
-
-/* GPIO Port A REGISTERS */
-#define GPIOA_BASE          (u32)0x42020000                                 /* GPIO Port A base address */
-#define GPIOA_MODER         *((volatile u32 *) (GPIOA_BASE  + 0x00))        /* Port A Mode register */
-#define GPIOA_OTYPER        *((volatile u32 *) (GPIOA_BASE  + 0x04))        /* Port A Output Type Register */
-#define GPIOA_ODR           *((volatile u32 *) (GPIOA_BASE  + 0x14))        /* Output Data Set And Reset Register */
-
-/* GPIO Port B REGISTERS */
-#define GPIOB_BASE          (u32)0x42020400                                 /* GPIO Port A base address */
-#define GPIOB_MODER         *((volatile u32 *) (GPIOB_BASE  + 0x00))        /* Port A Mode register */
-#define GPIOB_OTYPER        *((volatile u32 *) (GPIOB_BASE  + 0x04))        /* Port A Output Type Register */
-#define GPIOB_ODR           *((volatile u32 *) (GPIOB_BASE  + 0x14))        /* Output Data Set And Reset Register */
-
-/* GPIO Port B REGISTERS */
-#define GPIOC_BASE          (u32)0x42020800                                 /* GPIO Port C base address */
-#define GPIOC_MODER         *((volatile u32 *) (GPIOC_BASE  + 0x00))        /* Port C Mode register */
-#define GPIOC_OTYPER        *((volatile u32 *) (GPIOC_BASE  + 0x04))        /* Port C Output Type Register */
-#define GPIOC_ODR           *((volatile u32 *) (GPIOC_BASE  + 0x14))        /* Output Data Set And Reset Register */
-
-#define PORTA_AHBEN         0                                               /* GPIOA Enable is located on AHB2 Board Bit 0 */
-#define PORTB_AHBEN         1                                               /* GPIOB Enable is located on AHB2 Board Bit 1 */
-#define PORTC_AHBEN         2                                               /* GPIOC Enable is located on AHB2 Board Bit 2 */
-
-/* Reset and Clock Control (RCC) */
-#define RCC_BASE            (u32)0X40021000                                 /* RCC base address */
-#define RCC_CR              *((volatile u32 *) (RCC_BASE + 0x00))           /* Clock Control Register */
-#define RCC_AHB2ENR         *((volatile u32 *) (RCC_BASE + 0x4C))           /* AHB2 Enable Register */
-
-/* User required */                                          
-#define MASK_2_BIT         (u32)0x00000003                                  /* 2 bit mask, example 0011 = 0x03 */
+#define RCC         ((RCC_TypeDef *)RCC_BASE)
+#define GPIOA       ((GPIO_TypeDef *)GPIOA_BASE)
+#define GPIOB       ((GPIO_TypeDef *)GPIOB_BASE)
+#define GPIOC       ((GPIO_TypeDef *)GPIOC_BASE)
 
 /* Extern Keyword Allows To Be Call */
 extern void SystemInit() {
-    set_ptr_vol_bit_u32(&RCC_AHB2ENR,(1 << PORTA_AHBEN));
-    set_ptr_vol_bit_u32(&RCC_AHB2ENR,(1 << PORTB_AHBEN));
-    set_ptr_vol_bit_u32(&RCC_AHB2ENR,(1 << PORTC_AHBEN));
+    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOA_AHB2EN);
+    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOB_AHB2EN);
+    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOC_AHB2EN);
 }
 
 extern void main() {
-    set_ptr_vol_u32(&GPIOA_MODER, (LED_RED * 2), MASK_2_BIT, 1);
-    set_ptr_vol_u32(&GPIOB_MODER, (LED_BLU * 2), MASK_2_BIT, 1);
-    set_ptr_vol_u32(&GPIOC_MODER, (LED_GRN * 2), MASK_2_BIT, 1);
-    clr_ptr_vol_bit_u32(&GPIOA_OTYPER, (1 << LED_RED));
-    clr_ptr_vol_bit_u32(&GPIOB_OTYPER, (1 << LED_BLU));
-    clr_ptr_vol_bit_u32(&GPIOC_OTYPER, (1 << LED_GRN));
+    set_ptr_vol_u32(&GPIOA->MODER, (LED_RED_PIN * 2), MASK_2_BIT, 1);
+    set_ptr_vol_u32(&GPIOB->MODER, (LED_BLU_PIN * 2), MASK_2_BIT, 1);
+    set_ptr_vol_u32(&GPIOC->MODER, (LED_GRN_PIN * 2), MASK_2_BIT, 1);
+    clr_ptr_vol_bit_u32(&GPIOA->OTYPER, LED_RED);
+    clr_ptr_vol_bit_u32(&GPIOB->OTYPER, LED_BLU);
+    clr_ptr_vol_bit_u32(&GPIOC->OTYPER, LED_GRN);
 
     int i = 0;
     while (1) {
-        for (i = 0; i < 1200000; ++i) {
+        for (i = 0; i < 1200000; i++) {
             if (i == 300000) {
-                set_ptr_vol_bit_u32(&GPIOC_ODR,(1 << LED_GRN));
+                set_ptr_vol_bit_u32(&GPIOC->ODR, LED_GRN);
+            } else if (i == 600000) {
+                set_ptr_vol_bit_u32(&GPIOB->ODR, LED_BLU);
+            } else if (i == 900000) {
+                set_ptr_vol_bit_u32(&GPIOA->ODR, LED_RED);
             } else if (i == 0) {
-                clr_ptr_vol_bit_u32(&GPIOC_ODR,(1 << LED_GRN));
-            }
-
-            if (i == 600000) {
-                set_ptr_vol_bit_u32(&GPIOB_ODR,(1 << LED_BLU));
-            } else if (i == 0) {
-                clr_ptr_vol_bit_u32(&GPIOB_ODR,(1 << LED_BLU));
-            }
-
-            if (i == 900000) {
-                set_ptr_vol_bit_u32(&GPIOA_ODR,(1 << LED_RED));
-            } else if (i == 0) {
-                clr_ptr_vol_bit_u32(&GPIOA_ODR,(1 << LED_RED));
+                clr_ptr_vol_bit_u32(&GPIOC->ODR, LED_GRN);
+                clr_ptr_vol_bit_u32(&GPIOB->ODR, LED_BLU);
+                clr_ptr_vol_bit_u32(&GPIOA->ODR, LED_RED);
             }
         }
     }

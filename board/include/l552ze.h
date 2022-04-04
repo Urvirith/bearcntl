@@ -53,7 +53,9 @@
 #define SPI3_BASE                   ((u32)0x40003C00)
 
 /* CAN Interface */
-#define CAN_BASE                    ((u32)0x4000AC00)
+#define FDCAN_BASE                  ((u32)0x4000A400)
+#define FDCAN_RAM_BASE              ((u32)0x4000AC00)
+#define FDCAN_ENDR_BASE             ((u32)0x4000AFFF)
 
 /* System Control Base */
 #define SCS_BASE                    ((u32)0xE000E000)
@@ -149,6 +151,22 @@
 #define SPI_MODE                    Gpio_Alternate
 #define SPI_OTYPE                   Gpio_Push_Pull
 #define SPI_AF                      AF5
+
+/* FDCAN */
+#define RCC_FDCAN                   BIT_9
+#define RCC_CCIP_OFFSET             (u32)24                             /* RCC CCIPR1 Offset 24 */
+#define RCC_CCIP_CLK                (u32)1                              /* RCC CCIPR1 Clock PLLSAI "Q" 48Mhz Clock */
+#define GPIOD_PIN0                  (u32)0                              /* GPIO Bus D Pin 0 CAN RX */
+#define GPIOD_PIN1                  (u32)1                              /* GPIO Bus D Pin 1 CAN TX */
+#define FDCAN_TX                    GPIOD_PIN1
+#define FDCAN_RX                    GPIOD_PIN0
+
+/* GPIO SETUP */
+#define FDCAN_MODE                  Gpio_Alternate
+#define FDCAN_OTYPE                 Gpio_Push_Pull
+#define FDCAN_AF                    AF9
+#define FDCAN_SPEED                 Gpio_High_Speed
+#define FDCAN_PUPD                  Gpio_PullUp
 
 /* SPI 2*/
 /* RCC */

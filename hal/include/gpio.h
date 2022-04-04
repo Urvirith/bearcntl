@@ -9,11 +9,6 @@
 // GPIO Description - is on pg 450
 
 /* General Purpose I/O */
-
-/* Register Base */
-/* Defined In The Board Specific Folder */
-
-/* Register Pointer Structure */
 typedef struct {
     volatile u32 MODER;             // Mode Register
     volatile u32 OTYPER;            // Output Type Register

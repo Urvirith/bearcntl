@@ -9,37 +9,6 @@
 // USART Description - is on pg 1559
 
 /* Universal Synchronous/Asynchronous Receiver Transmitter */
-
-    // Any USART bidirectional communication requires a minimum of two pins: Receive data In (RX) and Transmit data Out (TX):
-    // • RX: Receive data Input. This is the serial data input.
-    //   Oversampling techniques are used for data recovery by discriminating between valid incoming data and noise.
-    // • TX: Transmit data Output. When the transmitter is disabled, the output pin returns to its I/O port configuration.
-    //   When the transmitter is enabled and nothing is to be transmitted, the TX pin is at high level.
-    //   In Single-wire and Smartcard modes, this I/O is used to transmit and receive the data
-
-    // Serial data are transmitted and received through these pins in normal USART mode. The frames are comprised of:
-    // • An Idle Line prior to transmission or reception
-    // • A start bit • A data word (7, 8 or 9 bits) least significant bit first
-    // • 0.5, 1, 1.5, 2 stop bits indicating that the frame is complete
-    // • The USART interface uses a baud rate generator • A status register (USART_ISR)
-    // • Receive and transmit data registers (USART_RDR, USART_TDR)
-    // • A baud rate register (USART_BRR)
-    // • A guard-time register (USART_GTPR) in case of Smartcard mode.
-
-    // Refer to Section 38.8: USART registers on page 1238 for the definitions of each bit.
-    // The following pin is required to interface in synchronous mode and Smartcard mode:
-    // • CK: Clock output. This pin outputs the transmitter data clock for synchronous transmission corresponding to SPI master mode
-    //  (no clock pulses on start bit and stop bit, and a software option to send a clock pulse on the last data bit).
-    //  In parallel, data can be received synchronously on RX. This can be used to control peripherals that have shift registers.
-    //  The clock phase and polarity are software programmable. In Smartcard mode, CK output can provide the clock to the smartcard.
-
-    // The following pins are required in RS232 Hardware flow control mode:
-    // • CTS: Clear To Send blocks the data transmission at the end of the current transfer when high
-    // • RTS: Request to send indicates that the USART is ready to receive data (when low).
-    // The following pin is required in RS485 Hardware control mode:
-    // • DE: Driver Enable activates the transmission mode of the external transceiver.
-
-/* Register Pointer Structure */
 typedef struct {
     volatile u32 CR1;               // Control Register 1
     volatile u32 CR2;               // Control Register 2

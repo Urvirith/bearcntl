@@ -1,3 +1,4 @@
+/* Timers */
 #include "timer.h"
 
 /* Register Masks */

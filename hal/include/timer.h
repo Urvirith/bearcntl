@@ -9,11 +9,6 @@
 // Timer Description - is on pg 1181
 
 /* Timers */
-
-/* Register Base */
-/* Defined In The Board Specific Folder */
-
-/* Register Pointer Structure */
 typedef struct {
     volatile u32 CR1;               // Control Register 1
     volatile u32 CR2;               // Control Register 2

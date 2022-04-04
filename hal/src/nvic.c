@@ -1,3 +1,4 @@
+/* Nested vectored interrupt controller (NVIC) */
 #include "nvic.h"
 
 #define NVIC_32BIT      (u32)32

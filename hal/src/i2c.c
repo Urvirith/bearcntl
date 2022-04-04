@@ -1,3 +1,4 @@
+/* Inter-Integrated Circuit (I2C) */
 #include "i2c.h"
 
 /* Register Masks */

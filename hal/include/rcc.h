@@ -9,11 +9,6 @@
 // RCC Description - is on pg 327
 
 /* Reset and Clock Control (RCC) */
-
-/* Register Base */
-/* Defined In The Board Specific Folder */
-
-/* Register Pointer Structure */
 typedef struct {
     volatile u32 CR;                // Control Register
     volatile u32 ICSCR;             // Internal Clock Sources Calibration Register
@@ -60,12 +55,12 @@ typedef struct {
 
 /* Public Functions */
 void rcc_write_msi_range(RCC_TypeDef *ptr, MSI_Range freq_khz);
-void rcc_write_ahb1_enr(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_ahb2_enr(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_ahb3_enr(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_apb1_enr1(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_apb1_enr2(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_apb2_enr(RCC_TypeDef *ptr, u32 bit_num);
-void rcc_write_ccipr1(RCC_TypeDef *ptr, u32 offset, u32 value);
+void rcc_write_ahb1_enr(RCC_TypeDef *ptr, u32 val);
+void rcc_write_ahb2_enr(RCC_TypeDef *ptr, u32 val);
+void rcc_write_ahb3_enr(RCC_TypeDef *ptr, u32 val);
+void rcc_write_apb1_enr1(RCC_TypeDef *ptr, u32 val);
+void rcc_write_apb1_enr2(RCC_TypeDef *ptr, u32 val);
+void rcc_write_apb2_enr(RCC_TypeDef *ptr, u32 val);
+void rcc_write_ccipr1(RCC_TypeDef *ptr, u32 offset, u32 val);
 
 #endif /* RCC_H_ */

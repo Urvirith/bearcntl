@@ -1,3 +1,4 @@
+/* Serial Peripheral Interface */
 #include "spi.h"
 
 /* Register Masks */
