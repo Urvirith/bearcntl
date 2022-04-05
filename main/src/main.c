@@ -8,9 +8,14 @@
 
 /* Extern Keyword Allows To Be Call */
 extern void SystemInit() {
-    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOA_AHB2EN);
-    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOB_AHB2EN);
-    set_ptr_vol_bit_u32(&RCC->AHB2_ENR, RCC_GPIOC_AHB2EN);
+    rcc_write_ahb2_enr(RCC, RCC_GPIOA_AHB2EN);
+    rcc_write_ahb2_enr(RCC, RCC_GPIOB_AHB2EN);
+    rcc_write_ahb2_enr(RCC, RCC_GPIOC_AHB2EN);
+    rcc_set_pll(RCC, Rcc_MSI, 0, 24);
+    rcc_set_pllclk(RCC, Rcc_PLL2);
+    rcc_start_pll(RCC);
+    rcc_set_pllclk_en(RCC);
+    rcc_sys_clk(RCC, 3);
 }
 
 extern void main() {

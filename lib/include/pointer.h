@@ -3,18 +3,6 @@
 
 #include "common.h"
 
-/* Public Functions */
-/* Inline Pointer Functions */
-inline bool get_ptr_vol_bit_u32(volatile u32 *, u32);           /* Get a pointer bit in a u32 ptr Example value (10000 >> 5) -> 1 */
-inline void set_ptr_vol_bit_u32(volatile u32 *, u32);           /* Set a pointer bit in a u32 ptr Example value (1 << 5) */
-inline void clr_ptr_vol_bit_u32(volatile u32 *, u32);           /* Clear a pointer bit in a u32 ptr Example value (1 << 5) */
-inline u32 get_ptr_vol_u32(volatile u32 *, u32, u32);           /* Get a pointer bit in a u32 ptr Example value (10000 >> 5) -> 1 */
-inline void set_ptr_vol_u32(volatile u32 *, u32, u32, u32);     /* Write to a pointer with offset and mask size, ensure mask >= value */
-inline u8 get_ptr_vol_raw_u8(volatile u8 *);                    /* Get a pointer value */
-inline void set_ptr_vol_raw_u8(volatile u8 *, u8);              /* Write to a pointer with raw value */
-inline u32 get_ptr_vol_raw_u32(volatile u32 *);                 /* Get a pointer value */
-inline void set_ptr_vol_raw_u32(volatile u32 *, u32);           /* Write to a pointer with raw value */
-
 /* Inline Function Definitions */
 inline bool get_ptr_vol_bit_u32(volatile u32 *ptr, u32 val) {
     if ((*ptr & val) > 0) {
@@ -28,6 +16,12 @@ inline bool get_ptr_vol_bit_u32(volatile u32 *ptr, u32 val) {
    If passing a stuct pointer ie. GPIOB->ODR, you can pass by reference &GPIO->ODR */
 inline void set_ptr_vol_bit_u32(volatile u32 *ptr, u32 val){
     *ptr |= val; 
+}
+
+/* Set Reset a pointer bit in a u32 ptr Example value (1 << 5), 
+   If passing a stuct pointer ie. GPIOB->ODR, you can pass by reference &GPIO->ODR */
+inline void sr_ptr_vol_bit_u32(volatile u32 *ptr, u32 val){
+    *ptr ^= val; 
 }
 
 /* Clear a pointer bit in a u32 ptr Example value (1 << 5) 

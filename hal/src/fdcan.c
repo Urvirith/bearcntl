@@ -45,27 +45,7 @@
 #define FILTER_REJECT       3
 
 
-volatile struct can_data_struct can_data;
-
-const struct can_message* can_msg[]= {&canreq_rpm,&canreq_coolant,&canreq_speed,&canreq_drossel};
-
-volatile uint8_t can_queque_index=0;
-volatile const uint8_t can_msg_max_index=(sizeof(can_msg)/sizeof(can_msg[0])) - 1;
-
-
-void can_send_next(void){
-	if(can_queque_index > can_msg_max_index) can_queque_index=0;
-	cansend((struct can_message*)can_msg[can_queque_index]);
-	can_queque_index++; 
-};
-
-
 void can1_init(void){
-/*
-CAN1:
-PB8 - RX
-PB9 - TX
-*/
 	uint32_t* ptr;
 
 	RCC->AHB4ENR |= RCC_AHB4ENR_GPIOBEN; 

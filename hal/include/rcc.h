@@ -53,14 +53,35 @@ typedef struct {
     volatile u32 DLYCFGR;           // OCTOSPI delay configuration register
 } RCC_TypeDef;
 
+typedef enum rcc_pllsrc {
+    Rcc_none,
+    Rcc_MSI,
+    Rcc_HSI16,
+    Rcc_HSE,
+} RCC_PLLSrc;
+
+typedef enum rcc_plldiv {
+    Rcc_PLL2,
+    Rcc_PLL4,
+    Rcc_PLL6,
+    Rcc_PLL8,
+} RCC_PLLDiv;
+
 /* Public Functions */
 void rcc_write_msi_range(RCC_TypeDef *ptr, MSI_Range freq_khz);
+void rcc_sys_clk(RCC_TypeDef *ptr, u32 src);
+void rcc_set_pll(RCC_TypeDef *ptr, RCC_PLLSrc src, u32 pllm, u32 plln);
+void rcc_start_pll(RCC_TypeDef *ptr);
+void rcc_set_pll48clk(RCC_TypeDef *ptr, RCC_PLLDiv div);
+void rcc_set_pll48clk_en(RCC_TypeDef *ptr);
+void rcc_set_pllclk(RCC_TypeDef *ptr, RCC_PLLDiv div);
+void rcc_set_pllclk_en(RCC_TypeDef *ptr);
 void rcc_write_ahb1_enr(RCC_TypeDef *ptr, u32 val);
 void rcc_write_ahb2_enr(RCC_TypeDef *ptr, u32 val);
 void rcc_write_ahb3_enr(RCC_TypeDef *ptr, u32 val);
 void rcc_write_apb1_enr1(RCC_TypeDef *ptr, u32 val);
 void rcc_write_apb1_enr2(RCC_TypeDef *ptr, u32 val);
 void rcc_write_apb2_enr(RCC_TypeDef *ptr, u32 val);
-void rcc_write_ccipr1(RCC_TypeDef *ptr, u32 offset, u32 val);
+void rcc_write_ccipr1(RCC_TypeDef *ptr, u32 val);
 
 #endif /* RCC_H_ */

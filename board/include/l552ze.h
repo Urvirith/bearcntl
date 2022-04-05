@@ -2,6 +2,7 @@
 #define L552ZE_H_
 
 #include "common.h"
+#include "gpio.h"
 
 /* Notes */
 /* 1 Mhz = 1,000,000 CPS */
@@ -153,9 +154,9 @@
 #define SPI_AF                      AF5
 
 /* FDCAN */
-#define RCC_FDCAN                   BIT_9
-#define RCC_CCIP_OFFSET             (u32)24                             /* RCC CCIPR1 Offset 24 */
-#define RCC_CCIP_CLK                (u32)1                              /* RCC CCIPR1 Clock PLLSAI "Q" 48Mhz Clock */
+#define RCC_FDCAN_APB1ENR2          BIT_9
+#define RCC_CCIPR1_OFFSET           (u32)24                             /* RCC CCIPR1 Offset 24 */
+#define RCC_CCIPR1_CLK              (u32)0                              /* RCC CCIPR1 HSE Clock */
 #define GPIOD_PIN0                  (u32)0                              /* GPIO Bus D Pin 0 CAN RX */
 #define GPIOD_PIN1                  (u32)1                              /* GPIO Bus D Pin 1 CAN TX */
 #define FDCAN_TX                    GPIOD_PIN1
@@ -165,31 +166,9 @@
 #define FDCAN_MODE                  Gpio_Alternate
 #define FDCAN_OTYPE                 Gpio_Push_Pull
 #define FDCAN_AF                    AF9
-#define FDCAN_SPEED                 Gpio_High_Speed
-#define FDCAN_PUPD                  Gpio_PullUp
+#define FDCAN_SPEED                 Gpio_Very_High_Speed
+#define FDCAN_PUPD                  Gpio_NoPuPd
 
-/* SPI 2*/
-/* RCC */
-//#define RCC_SPI2_APB1R1EN:        BIT14
-
-/* SPI 3*/
-/* RCC */
-//#define RCC_SPI3_APB1R1EN:        BIT15
-
-
-/* I2C 1*/
-//#define I2C1_RCC_APB1R1_ENABLE:     u32 = common::BIT_21;
-//#define PORTB_PIN6:                 u32 = 6;    //D5    SCL
-//#define PORTB_PIN7:                 u32 = 7;    //D4    SDA
-//#define I2C1_SCL:                   u32 = PORTB_PIN6;
-//#define I2C1_SDA:                   u32 = PORTB_PIN7;
-
-/* GPIO SETUP */
-//#define CAN_MODE:                   gpio::Mode = gpio::Mode::Alt;
-//#define CAN_OTYPE:                  gpio::OType = gpio::OType::PushPull;
-//#define CAN_AF:                     gpio::AltFunc = gpio::AltFunc::Af9;
-//#define CAN_OSPEED:                 gpio::OSpeed = gpio::OSpeed::High;
-//#define CAN_PUPD:                   gpio::Pupd = gpio::Pupd::Pu;
 
 enum nvic_irq {
     WWDG_IRQ,                   /*  0       Window Watchdog */

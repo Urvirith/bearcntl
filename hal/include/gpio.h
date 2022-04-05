@@ -49,8 +49,8 @@ typedef enum gpio_ospeed {
 // 00: No pull-up, pull-down     01: Pull-up     10: Pull-down     11: Reserved
 typedef enum gpio_pupd {
     Gpio_NoPuPd,
-    Gpio_PullUp,
-    Gpio_PullDown
+    Gpio_Pullup,
+    Gpio_Pulldown
 } GPIO_PuPd;
 
 /* 0000: AF0     0001: AF1     0010: AF2     0011: AF3     0100: AF4     0101: AF5
