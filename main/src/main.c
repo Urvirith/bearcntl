@@ -11,8 +11,8 @@ extern void SystemInit() {
     rcc_write_ahb2_enr(RCC, RCC_GPIOA_AHB2EN);
     rcc_write_ahb2_enr(RCC, RCC_GPIOB_AHB2EN);
     rcc_write_ahb2_enr(RCC, RCC_GPIOC_AHB2EN);
-    rcc_set_pll(RCC, Rcc_MSI, 0, 24);
-    rcc_set_pllclk(RCC, Rcc_PLL2);
+    rcc_set_pll(RCC, Rcc_MSI, 1, 192);
+    rcc_set_pllclk(RCC, Rcc_PLL4);
     rcc_start_pll(RCC);
     rcc_set_pllclk_en(RCC);
     rcc_sys_clk(RCC, 3);
@@ -27,13 +27,14 @@ extern void main() {
     clr_ptr_vol_bit_u32(&GPIOC->OTYPER, LED_GRN);
 
     int i = 0;
+    int lim = 100000;
     while (1) {
-        for (i = 0; i < 1200000; i++) {
-            if (i == 300000) {
+        for (i = 0; i < lim * 12; i++) {
+            if (i == lim * 3) {
                 set_ptr_vol_bit_u32(&GPIOC->ODR, LED_GRN);
-            } else if (i == 600000) {
+            } else if (i == lim * 6) {
                 set_ptr_vol_bit_u32(&GPIOB->ODR, LED_BLU);
-            } else if (i == 900000) {
+            } else if (i == lim * 9) {
                 set_ptr_vol_bit_u32(&GPIOA->ODR, LED_RED);
             } else if (i == 0) {
                 clr_ptr_vol_bit_u32(&GPIOC->ODR, LED_GRN);

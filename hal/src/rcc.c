@@ -59,9 +59,9 @@ void rcc_write_msi_range(RCC_TypeDef *ptr, MSI_Range freq_khz) {
 /* Set system clock source */
 void rcc_sys_clk(RCC_TypeDef *ptr, u32 src) {
     set_ptr_vol_u32(&ptr->CFGR, SW_OFFSET, SW_MASK, src);
-    //while (get_ptr_vol_u32(&ptr->CFGR, SWS_OFFSET, SW_MASK) != src) {
+    while (get_ptr_vol_u32(&ptr->CFGR, SWS_OFFSET, SW_MASK) != src) {
         // SPIN WHILE CLOCK IS NOT SET TO SYSTEM CLOCK SOURCE REQUEST
-    //};
+    };
 }
 
 /* Set The PLL */
@@ -97,7 +97,7 @@ void rcc_set_pll48clk(RCC_TypeDef *ptr, RCC_PLLDiv div) {
 
 /* Set The PLLQ Clock En */
 void rcc_set_pll48clk_en(RCC_TypeDef *ptr) {
-    set_ptr_vol_bit_u32(&ptr->AHB1_ENR, PLLQEN);
+    set_ptr_vol_bit_u32(&ptr->PLL_CFGR, PLLQEN);
 }
 
 /* Set The PLLR Clock */
@@ -107,7 +107,7 @@ void rcc_set_pllclk(RCC_TypeDef *ptr, RCC_PLLDiv div) {
 
 /* Set The PLLR Clock En */
 void rcc_set_pllclk_en(RCC_TypeDef *ptr) {
-    set_ptr_vol_bit_u32(&ptr->AHB1_ENR, PLLREN);
+    set_ptr_vol_bit_u32(&ptr->PLL_CFGR, PLLREN);
 }
 
 void rcc_write_ahb1_enr(RCC_TypeDef *ptr, u32 val) {
