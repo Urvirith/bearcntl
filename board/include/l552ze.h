@@ -154,9 +154,8 @@
 #define SPI_AF                      AF5
 
 /* FDCAN */
-#define RCC_FDCAN_APB1ENR2          BIT_9
-#define RCC_CCIPR1_OFFSET           (u32)24                             /* RCC CCIPR1 Offset 24 */
-#define RCC_CCIPR1_CLK              (u32)0                              /* RCC CCIPR1 HSE Clock */
+#define RCC_FDCAN_APB1_ENR2         BIT_9
+#define RCC_FDCAN_CCIPR1_PLLQCLK    BIT_24                              /* RCC CCIPR1 PLLQCLK  */
 #define GPIOD_PIN0                  (u32)0                              /* GPIO Bus D Pin 0 CAN RX */
 #define GPIOD_PIN1                  (u32)1                              /* GPIO Bus D Pin 1 CAN TX */
 #define FDCAN_TX                    GPIOD_PIN1

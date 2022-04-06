@@ -16,6 +16,12 @@ void set_ptr_vol_bit_u32(volatile u32 *ptr, u32 value){
     *ptr |= value; 
 }
 
+/* Set Reset a pointer bit in a u32 ptr Example value (1 << 5), 
+   If passing a stuct pointer ie. GPIOB->ODR, you can pass by reference &GPIO->ODR */
+void sr_ptr_vol_bit_u32(volatile u32 *ptr, u32 val){
+    *ptr ^= val; 
+}
+
 /* Clear a pointer bit in a u32 ptr Example value (1 << 5) 
    If passing a stuct pointer ie. GPIOB->ODR, you can pass by reference &GPIO->ODR */
 void clr_ptr_vol_bit_u32(volatile u32 *ptr, u32 value){

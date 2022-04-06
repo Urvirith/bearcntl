@@ -72,7 +72,7 @@ void rcc_sys_clk(RCC_TypeDef *ptr, u32 src) {
     freq(PLL_R) = f(VCO Clock) / PLLR
 */
 /* Set The VCO Clock freq(VCO CLOCK) = freq(PLL Clock Input) * (PLLN / PLLM) */ 
-void rcc_set_pll(RCC_TypeDef *ptr, RCC_PLLSrc src, u32 pllm, u32 plln) {
+void rcc_set_pll(RCC_TypeDef *ptr, RCC_PLLSrc src, u32 plln, u32 pllm) {
     clr_ptr_vol_bit_u32(&ptr->CR, PLLON);
     while(get_ptr_vol_bit_u32(&ptr->CR, PLLRDY)){
         // Spin Dead Until PLL Not Ready

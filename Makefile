@@ -41,7 +41,10 @@ STARTUP		:= startup_stm32l552ze.s
 LINKER		:= linker_stm32l552ze.ld
 
 OBJS 		:=	$(OBJ_DIR)/main.o \
-				$(OBJ_DIR)/rcc.o
+				$(OBJ_DIR)/pointer.o \
+				$(OBJ_DIR)/rcc.o \
+				$(OBJ_DIR)/gpio.o
+
 
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h
@@ -78,6 +81,10 @@ $(OBJ_DIR)/%.o: $(MAIN_DIR)/$(SRC_DIR)/%.c
 
 $(OBJ_DIR)/%.o: $(HAL_DIR)/$(SRC_DIR)/%.c
 	$(CC) -I $(HAL_DIR)/$(INC_DIR) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
+
+# Build Library
+$(OBJ_DIR)/%.o: $(LIB_DIR)/$(SRC_DIR)/%.c
+	$(CC) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
 
 clean:
 	rm -f $(OBJ_DIR)/*.o
