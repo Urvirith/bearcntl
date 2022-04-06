@@ -6,5 +6,6 @@
 #include "l552ze.h"
 #include "rcc.h"
 #include "gpio.h"
+#include "timer.h"
 
 #endif /* MAIN_H_ */

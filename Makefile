@@ -43,8 +43,8 @@ LINKER		:= linker_stm32l552ze.ld
 OBJS 		:=	$(OBJ_DIR)/main.o \
 				$(OBJ_DIR)/pointer.o \
 				$(OBJ_DIR)/rcc.o \
-				$(OBJ_DIR)/gpio.o
-
+				$(OBJ_DIR)/gpio.o \
+				$(OBJ_DIR)/timer.o
 
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h

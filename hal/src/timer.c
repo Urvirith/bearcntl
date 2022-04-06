@@ -115,8 +115,12 @@ void timer_stop(TIMER_TypeDef *ptr) {
     clr_ptr_vol_bit_u32(&ptr->CR1, EN_BIT);
 }
 
-/* Set Prescaler, And Auto Reload Register */
-/* Prescaler = PSC - 1, due to register being PSC + 1, ARR - 1 due to loading and ticking over to 0 */
+/* 
+    Set Prescaler, And Auto Reload Register 
+    Prescaler = PSC - 1, due to register being PSC + 1, ARR - 1 due to loading and ticking over to 0 
+    Use the clock speed in kHz to get clock count in ms and Mhz for us 
+    In Short val = (time * clock_speed) / prescale - 1     (time * clock_speed) so be less than 32767 to be safe   
+*/
 void timer_set_time(TIMER_TypeDef *ptr, u32 time, u32 clock_speed, u32 prescale) {
     u32 value = 0;
     u32 psc = 0;
