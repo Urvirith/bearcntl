@@ -56,20 +56,6 @@ typedef struct {
 	volatile u32   	CKDIV; 	    	// CFG Clock Divider Register
 } FDCAN_TypeDef;
 
-/* Structure For The TX Message */
-typedef struct { 
-	u32				ID;				// Standard or Extended Identifier
-	u32				MM;				// Message Marker
-	u32				DLC;			// Data Length Code
-	bool 			ESI;			// Error State - 0: Depends On Error Passive Flag, 1: Transmitted Recessive
-	bool			XTD;			// Extended Identifier - 0: Standard - 11 Bit, 1: Extended - 29 Bit
-	bool			RTR;			// Remote Transmission Request 0: Data Frame, 1: Remote Frame
-	bool			EFC;			// Event FIFO Control - 0: Do Not Store TX Events, 1: Store TX Events
-	bool			FDF;			// FD Format - 0: Classical CAN Format, 1: Frame Transmitted In CAN FD Format
-	bool			BRS;			// Bit Rate Switching - 0: CANFD Transmitted Without Bit Switching, 1: CANFD Transmitted With Bit Switching
-	u8				DATA[64];		// 64 Bytes Of Data
-} FDCANMsgTX_TypeDef;
-
 /* Structure For The RX Message */
 typedef struct { 
 	u32				ID;				// Standard or Extended Identifier
@@ -84,6 +70,20 @@ typedef struct {
 	bool			BRS;			// Bit Rate Switching - 0: CANFD Transmitted Without Bit Switching, 1: CANFD Transmitted With Bit Switching
 	u8				DATA[64];		// 64 Bytes Of Data
 } FDCANMsgRX_TypeDef;
+
+/* Structure For The TX Message */
+typedef struct { 
+	u32				ID;				// Standard or Extended Identifier
+	u32				MM;				// Message Marker
+	u32				DLC;			// Data Length Code
+	bool 			ESI;			// Error State - 0: Depends On Error Passive Flag, 1: Transmitted Recessive
+	bool			XTD;			// Extended Identifier - 0: Standard - 11 Bit, 1: Extended - 29 Bit
+	bool			RTR;			// Remote Transmission Request 0: Data Frame, 1: Remote Frame
+	bool			EFC;			// Event FIFO Control - 0: Do Not Store TX Events, 1: Store TX Events
+	bool			FDF;			// FD Format - 0: Classical CAN Format, 1: Frame Transmitted In CAN FD Format
+	bool			BRS;			// Bit Rate Switching - 0: CANFD Transmitted Without Bit Switching, 1: CANFD Transmitted With Bit Switching
+	u8				DATA[64];		// 64 Bytes Of Data
+} FDCANMsgTX_TypeDef;
 
 /* Enumerations */
 // Baud Rates

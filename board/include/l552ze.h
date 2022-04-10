@@ -53,10 +53,14 @@
 #define SPI2_BASE                   ((u32)0x40003800)
 #define SPI3_BASE                   ((u32)0x40003C00)
 
-/* CAN Interface */
+/* Controller Area Network Interface */
 #define FDCAN_BASE                  ((u32)0x4000A400)
 #define FDCAN_RAM_BASE              ((u32)0x4000AC00)
 #define FDCAN_ENDR_BASE             ((u32)0x4000AFFF)
+
+/* Universal Serial Bus Interface */
+#define USB_BASE                    ((u32)0x4000D400)
+#define USB_RAM_BASE                ((u32)0x4000D800)
 
 /* System Control Base */
 #define SCS_BASE                    ((u32)0xE000E000)

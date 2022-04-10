@@ -56,7 +56,7 @@
 #define LEN_1_BYTE          1
      
 /* Private Functions */
-static void set_timing_register(I2C_TypeDef *ptr, u32 scll, u32 sclh, u32 sdadel, u32 scldel, u32 presc);
+static inline void set_timing_register(I2C_TypeDef *ptr, u32 scll, u32 sclh, u32 sdadel, u32 scldel, u32 presc);
 
  // Initalization Flow ->
     // Clear PE bit in I2C_CR1
@@ -379,7 +379,7 @@ u8 i2c_std_write(I2C_TypeDef *ptr, u32 slave_addr, bool addr_10bit, bool req_10b
 }
 
 // PG. 1522-1523 (MATH TREE)
-static void set_timing_register(I2C_TypeDef *ptr, u32 scll, u32 sclh, u32 sdadel, u32 scldel, u32 presc) {
+static inline void set_timing_register(I2C_TypeDef *ptr, u32 scll, u32 sclh, u32 sdadel, u32 scldel, u32 presc) {
     set_ptr_vol_u32(&ptr->TIMINGR, SCLL_OFFSET, SCL_MASK, scll);
     set_ptr_vol_u32(&ptr->TIMINGR, SCLH_OFFSET, SCL_MASK, sclh);
     set_ptr_vol_u32(&ptr->TIMINGR, SDADEL_OFFSET, DEL_MASK, sdadel);

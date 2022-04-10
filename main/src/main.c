@@ -14,8 +14,10 @@ extern void SystemInit() {
     rcc_write_ahb2_enr(RCC, RCC_GPIOC_AHB2EN);          // ENABLE GPIOC
     rcc_set_pll(RCC, Rcc_MSI, 48, 0);                   // SET MULTIPLIER AND DIVIDER FOR PLL
     rcc_set_pllclk(RCC, Rcc_PLL6);                      // SET DIVIDER FOR PLLCLK
+    rcc_set_pll48clk(RCC, Rcc_PLL4);                    // SET DIVIDER FOR PLL48CLK
     rcc_start_pll(RCC);                                 // START PLL
     rcc_set_pllclk_en(RCC);                             // SET PLLCLK OUTPUT
+    rcc_set_pll48clk_en(RCC);                           // SET PLL48CLK OUTPUT
     rcc_write_ccipr1(RCC, RCC_FDCAN_CCIPR1_PLLQCLK);    // SELECT CCIPR1 FDCAN PLLQCLK
     rcc_write_apb1_enr2(RCC, RCC_FDCAN_APB1_ENR2);      // ENABLE RCC FDCAN CLOCK
     rcc_write_apb1_enr1(RCC, RCC_TIMER2_APB1R1EN);      // ENABLE TIMER 2
