@@ -56,34 +56,71 @@ typedef struct {
 	volatile u32   	CKDIV; 	    	// CFG Clock Divider Register
 } FDCAN_TypeDef;
 
+// Union For Defining Words 
+typedef union {
+	u32 reg;
+	struct {
+		u32 EXID	:18;			// Extended ID
+		u32 STID	:11;			// Standard ID
+		u32 RTR		:1;				// Remote Transmission Request
+		u32 XTD		:1;				// Extended ID Flag: 0 - Std, 1 - Ext
+		u32 ESI		:1;				// CAN FD Format
+	} fields;
+	struct {
+		u32 ID		:29;			// Combined ID
+		u32			:3;				// Reserved
+	} id;
+} FDCANE1_TypeDef;					// ELEMENT
+
+typedef union {
+	u32 reg;
+	struct {
+		u32 RXTS	:16;			// RX Timestamp - Only Used In RX
+		u32 DLC 	:4;				// Data Length Code: Classic CAN 0 - 8 Data Bytes, FDCAN 9 - 15 = 12/16/20/24/32/48/64 Data Bytes
+		u32 BRS		:1;				// Bit Rate Switch: 0 No Bit Rate Switch, 1 - Bit Rate Switch
+		u32 FD		:1;				// FD Format: 0 Standard Frame Format, 1 - FDCAN Frame Format
+		u32			:2;				// Reserved
+		u32 FIDX	:7;				// Filter Index - Index Of Matching RX Acceptance Filter Element
+		u32	ANMF	:1;				// Accepted Non-Matching Frames - Configured at RXGFC ANFS and ANFE
+	} fields;
+} FDCANRX_TypeDef;
+
+typedef union {
+	u32 reg;
+	struct {
+		u32 		:16;			// Reserved
+		u32 DLC 	:4;				// Data Length Code: Classic CAN 0 - 8 Data Bytes, FDCAN 9 - 15 = 12/16/20/24/32/48/64 Data Bytes
+		u32 BRS		:1;				// Bit Rate Switch: 0 No Bit Rate Switch, 1 - Bit Rate Switch
+		u32 FD		:1;				// FD Format: 0 Standard Frame Format, 1 - FDCAN Frame Format
+		u32			:1;				// Reserved
+		u32	EFC		:1;				// Event FIFO Control: 0 - Do Not Store TX Events, 1 Store TX Events
+		u32 MM		:8;				// Message Marker - 
+	} fields;
+} FDCANTX_TypeDef;
+
 /* Structure For The RX Message */
 typedef struct { 
-	u32				ID;				// Standard or Extended Identifier
-	u32				FIDX;			// Filter Index - 0 Frame Matching Filter Index FIDX, 1 Frame Did Not Match RX Filter Element
-	u32				DLC;			// Data Length Code
-	u32				RXTS;			// Timestamp Counter Value, Resolution Based On TSCC, TCP
-	bool 			ESI;			// Error State - 0: Depends On Error Passive Flag, 1: Transmitted Recessive
-	bool			XTD;			// Extended Identifier - 0: Standard - 11 Bit, 1: Extended - 29 Bit
-	bool			RTR;			// Remote Transmission Request 0: Data Frame, 1: Remote Frame
-	bool			ANMF;			// Accepted Non Matching Frame - 0: Received Fram Matching FIDX, Received Frame not matching any RX Filter Element 
-	bool			FDF;			// FD Format - 0: Classical CAN Format, 1: Frame Transmitted In CAN FD Format
-	bool			BRS;			// Bit Rate Switching - 0: CANFD Transmitted Without Bit Switching, 1: CANFD Transmitted With Bit Switching
+	FDCANE1_TypeDef HEADER;			// Header Data
+	FDCANRX_TypeDef RX;				// RX Elements
 	u8				DATA[64];		// 64 Bytes Of Data
 } FDCANMsgRX_TypeDef;
 
 /* Structure For The TX Message */
 typedef struct { 
-	u32				ID;				// Standard or Extended Identifier
-	u32				MM;				// Message Marker
-	u32				DLC;			// Data Length Code
-	bool 			ESI;			// Error State - 0: Depends On Error Passive Flag, 1: Transmitted Recessive
-	bool			XTD;			// Extended Identifier - 0: Standard - 11 Bit, 1: Extended - 29 Bit
-	bool			RTR;			// Remote Transmission Request 0: Data Frame, 1: Remote Frame
-	bool			EFC;			// Event FIFO Control - 0: Do Not Store TX Events, 1: Store TX Events
-	bool			FDF;			// FD Format - 0: Classical CAN Format, 1: Frame Transmitted In CAN FD Format
-	bool			BRS;			// Bit Rate Switching - 0: CANFD Transmitted Without Bit Switching, 1: CANFD Transmitted With Bit Switching
+	FDCANE1_TypeDef HEADER;			// Header Data
+	FDCANTX_TypeDef TX;				// TX Elements
 	u8				DATA[64];		// 64 Bytes Of Data
 } FDCANMsgTX_TypeDef;
+
+/* Structure For The Register Starting Locations */
+typedef struct {
+	u32 			STDFilterSA; 	// Standard Filter List Start Address
+  	u32 			EXTFilterSA; 	// Extended Filter List Start Address
+  	u32 			RXFIFO0SA;      // Rx FIFO 0 Start Address
+  	u32 			RXFIFO1SA;      // Rx FIFO 1 Start Address
+  	u32 			TXEventFIFOSA;  // Tx Event FIFO Start Address
+  	u32 			TXFIFOQSA;      // Tx FIFO/Queue Start Address
+} FDCANRamAddress_TypeDef;
 
 /* Enumerations */
 // Baud Rates
