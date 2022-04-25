@@ -5,13 +5,17 @@
 #define GPIOA       ((GPIO_TypeDef *)GPIOA_BASE)
 #define GPIOB       ((GPIO_TypeDef *)GPIOB_BASE)
 #define GPIOC       ((GPIO_TypeDef *)GPIOC_BASE)
+#define GPIOD       ((GPIO_TypeDef *)GPIOD_BASE)
 #define TIMER2      ((TIMER_TypeDef *)TIMER2_BASE)
+#define FDCAN       ((FDCAN_TypeDef *)FDCAN_BASE)
+#define FDCAN_RAM   ((FDCANRAM_TypeDef *)FDCAN_BASE)
 
 /* Extern Keyword Allows To Be Call */
 extern void SystemInit() {
     rcc_write_ahb2_enr(RCC, RCC_GPIOA_AHB2EN);          // ENABLE GPIOA
     rcc_write_ahb2_enr(RCC, RCC_GPIOB_AHB2EN);          // ENABLE GPIOB
     rcc_write_ahb2_enr(RCC, RCC_GPIOC_AHB2EN);          // ENABLE GPIOC
+    rcc_write_ahb2_enr(RCC, RCC_GPIOD_AHB2EN);          // ENABLE GPIOC
     rcc_set_pll(RCC, Rcc_MSI, 48, 0);                   // SET MULTIPLIER AND DIVIDER FOR PLL
     rcc_set_pllclk(RCC, Rcc_PLL6);                      // SET DIVIDER FOR PLLCLK
     rcc_set_pll48clk(RCC, Rcc_PLL4);                    // SET DIVIDER FOR PLL48CLK
@@ -25,12 +29,25 @@ extern void SystemInit() {
 }
 
 extern void main() {
+    // LED
     gpio_type(GPIOA, LED_RED_PIN, Gpio_Output, Gpio_Push_Pull, AF0);
     gpio_type(GPIOB, LED_BLU_PIN, Gpio_Output, Gpio_Push_Pull, AF0);
     gpio_type(GPIOC, LED_GRN_PIN, Gpio_Output, Gpio_Push_Pull, AF0);
+    
+    // FDCAN
+    gpio_type(GPIOD, FDCAN_TX, FDCAN_MODE, FDCAN_OTYPE, FDCAN_AF);
+    gpio_type(GPIOD, FDCAN_RX, FDCAN_MODE, FDCAN_OTYPE, FDCAN_AF);
+    gpio_speed(GPIOD, FDCAN_TX, FDCAN_SPEED);
+    gpio_speed(GPIOD, FDCAN_RX, FDCAN_SPEED);
+    gpio_pupd(GPIOD, FDCAN_TX, FDCAN_PUPD);
+    gpio_pupd(GPIOD, FDCAN_RX, FDCAN_PUPD);
+
     timer_open(TIMER2, Timer_Cont, Timer_Upcount);
     timer_set_time(TIMER2, 1000, 32000, 10000);
     timer_start(TIMER2);
+
+    // Start FDCAN
+    fdcan_open(FDCAN, FDCAN_RAM_BASE);
 
     u32 i = 0;
     while (1) {

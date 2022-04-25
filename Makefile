@@ -6,6 +6,7 @@ CC		    := $(TOOLCHAIN)gcc		# c compiler
 AS			:= $(TOOLCHAIN)as		# assembler
 LD 			:= $(TOOLCHAIN)ld 		# linker
 OBJ 		:= $(TOOLCHAIN)objcopy	# Object Copy
+READELF		:= $(TOOLCHAIN)readelf	# Object Copy
 
 # -Os				Optimize for Size
 # -mcpu=cortex-m4	Compile for the ARM M4 Processor
@@ -21,6 +22,7 @@ CFLAGS	  	:= $(OPTFLAGS) $(TARGET_ARCH) $(THUMB) #$(LINKTIME)
 ASFLAGS		:= $(TARGET_ARCH) $(THUMB)
 LDFLAGS 	:= -T 
 OBJFLAGS	:= -O binary
+ELFFLAGS	:= -a
 
 INC_DIR   	:= include
 SRC_DIR   	:= src
@@ -44,8 +46,8 @@ OBJS 		:=	$(OBJ_DIR)/main.o \
 				$(OBJ_DIR)/pointer.o \
 				$(OBJ_DIR)/rcc.o \
 				$(OBJ_DIR)/gpio.o \
-				$(OBJ_DIR)/timer.o
-
+				$(OBJ_DIR)/timer.o \
+				$(OBJ_DIR)/fdcan.o
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h
 #		$(CC) $(CFLAGS) -c $<
@@ -85,6 +87,9 @@ $(OBJ_DIR)/%.o: $(HAL_DIR)/$(SRC_DIR)/%.c
 # Build Library
 $(OBJ_DIR)/%.o: $(LIB_DIR)/$(SRC_DIR)/%.c
 	$(CC) -I $(LIB_DIR)/$(INC_DIR) $(CFLAGS) -c  $< -o $@
+
+readelf:
+	$(READELF) $(ELFFLAGS) $(BIN_DIR)/main.elf
 
 clean:
 	rm -f $(OBJ_DIR)/*.o

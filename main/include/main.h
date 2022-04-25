@@ -7,5 +7,6 @@
 #include "rcc.h"
 #include "gpio.h"
 #include "timer.h"
+#include "fdcan.h"
 
 #endif /* MAIN_H_ */

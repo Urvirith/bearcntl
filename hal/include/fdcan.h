@@ -3,12 +3,28 @@
 
 #include "common.h"
 #include "pointer.h"
-#include "l552ze.h"
 
 // FDCAN DRIVER
 // ARM FDCAN MODULE
 // FDCAN Description - is on pg 1883
 // FDCAN Registers (Programming Manual) - is on 1913
+
+/* RAM Setup */
+/* RAM Number Of Elements */
+#define RAM_FLS_ELM        	(u32)28         	// Max. Filter List Standard Number
+#define RAM_FLE_ELM         (u32)8          	// Max. Filter List Extended Number
+#define RAM_RF0_ELM         (u32)3          	// RX FIFO 0 Elements Number
+#define RAM_RF1_ELM         (u32)3          	// RX FIFO 1 Elements Number
+#define RAM_TEF_ELM         (u32)3         		// TX Event FIFO Elements Number
+#define RAM_TFQ_ELM         (u32)3         		// TX FIFO/Queue Elements Number
+
+/* RAM Length Of Elements */
+#define RAM_FLS_LEN        	(u32)1  			// Filter Standard Element Size in bytes
+#define RAM_FLE_LEN        	(u32)2  			// Filter Extended Element Size in bytes
+#define RAM_RF0_LEN        	(u32)18  			// RX FIFO 0 Elements Size in bytes
+#define RAM_RF1_LEN        	(u32)18  			// RX FIFO 1 Elements Size in bytes
+#define RAM_TEF_LEN        	(u32)2  			// TX Event FIFO Elements Size in bytes
+#define RAM_TFQ_LEN        	(u32)18  			// TX FIFO/Queue Elements Size in bytes
 
 /* FD Controller Area Network (FDCAN) */
 typedef struct {
@@ -56,6 +72,27 @@ typedef struct {
 	volatile u32   	CKDIV; 	    	// CFG Clock Divider Register
 } FDCAN_TypeDef;
 
+typedef struct {
+	u32 FLS[RAM_FLS_ELM * RAM_FLS_LEN];
+	u32 FLE[RAM_FLE_ELM * RAM_FLE_LEN];
+	u32 RF0[RAM_RF0_ELM * RAM_RF0_LEN];
+	u32 RF1[RAM_RF1_ELM * RAM_RF1_LEN];
+	u32 TEF[RAM_TEF_ELM * RAM_TEF_LEN];
+	u32 TFQ[RAM_TFQ_ELM * RAM_TFQ_LEN];
+} FDCANRAM_TypeDef;
+
+// Union For Defining Words 
+typedef union {
+	u32 reg;
+	struct {
+		u32 SFID2	:11;			// Second ID Of Standard ID Filter Element
+		u32 		:5
+		u32 SFID1	:11;			// First ID Of Standard ID Filter Element
+		u32 SFEC	:3;				// Stamdard Filter Element Configuration, 000 Disable, 001 RX FIFO 0 On Filter Match, 010 RX FIFO 1 On Filter Match, 011 Reject ID on Match, 100 Set Priority If Filter Matches, 101 Set Priority and Store FIFO0, 110 Set Priority and Store FIFO1
+		u32 SFT		:2;				// Filter Type - 00 Range Filter SFID 1 - SFID 2, 01 Dual Range Filter SFID1 or SFID2, 10, Classic Filter - SFID1 = Filter SFID = Filter 2, 11, Filter Disabled
+	} fields;
+} FDCANSTDFilter_TypeDef;			// ELEMENT
+
 // Union For Defining Words 
 typedef union {
 	u32 reg;
@@ -70,7 +107,7 @@ typedef union {
 		u32 ID		:29;			// Combined ID
 		u32			:3;				// Reserved
 	} id;
-} FDCANE1_TypeDef;					// ELEMENT
+} FDCANHE_TypeDef;					// ELEMENT
 
 typedef union {
 	u32 reg;
@@ -100,14 +137,14 @@ typedef union {
 
 /* Structure For The RX Message */
 typedef struct { 
-	FDCANE1_TypeDef HEADER;			// Header Data
+	FDCANHE_TypeDef HEADER;			// Header Data
 	FDCANRX_TypeDef RX;				// RX Elements
 	u8				DATA[64];		// 64 Bytes Of Data
 } FDCANMsgRX_TypeDef;
 
 /* Structure For The TX Message */
 typedef struct { 
-	FDCANE1_TypeDef HEADER;			// Header Data
+	FDCANHE_TypeDef HEADER;			// Header Data
 	FDCANTX_TypeDef TX;				// TX Elements
 	u8				DATA[64];		// 64 Bytes Of Data
 } FDCANMsgTX_TypeDef;
@@ -152,6 +189,6 @@ typedef enum fdcan_wordlength {
 } FDCAN_WordLength;
 
 /* Public Functions */
-
+void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base);
 
 #endif /* FDCAN_H_ */

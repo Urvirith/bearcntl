@@ -34,10 +34,15 @@
 #define TFGI_MASK			MASK_2_BIT
 
 /* Register Bits */
+/* TEST */
+#define LBCK				BIT_4
+
 /* CCCR */
 #define INIT				BIT_0
 #define CCE					BIT_1
+#define MON					BIT_5
 #define DAR					BIT_6
+#define TESTB				BIT_7
 #define FDOE				BIT_8
 #define BRSE				BIT_9
 #define PXHD				BIT_12
@@ -106,22 +111,6 @@
 #define LENU32				(u32)4				// Bytes In A u32 - Element Is Always 4 Bytes Long
 
 /* RAM Setup */
-/* RAM Number Of Elements */
-#define RAM_FLS_ELM        	(u32)28         	// Max. Filter List Standard Number
-#define RAM_FLE_ELM         (u32)8          	// Max. Filter List Extended Number
-#define RAM_RF0_ELM         (u32)3          	// RX FIFO 0 Elements Number
-#define RAM_RF1_ELM         (u32)3          	// RX FIFO 1 Elements Number
-#define RAM_TEF_ELM         (u32)3         		// TX Event FIFO Elements Number
-#define RAM_TFQ_ELM         (u32)3         		// TX FIFO/Queue Elements Number
-
-/* RAM Length Of Elements */
-#define RAM_FLS_LEN        	(u32)1  			// Filter Standard Element Size in bytes
-#define RAM_FLE_LEN        	(u32)2  			// Filter Extended Element Size in bytes
-#define RAM_RF0_LEN        	(u32)18  			// RX FIFO 0 Elements Size in bytes
-#define RAM_RF1_LEN        	(u32)18  			// RX FIFO 1 Elements Size in bytes
-#define RAM_TEF_LEN        	(u32)2  			// TX Event FIFO Elements Size in bytes
-#define RAM_TFQ_LEN        	(u32)18  			// TX FIFO/Queue Elements Size in bytes
-
 /* RAM Length Of Elements Per Byte */
 #define RAM_FLS_SIZE        (u32)(1  * LENU32)  // Filter Standard Element Size in bytes
 #define RAM_FLE_SIZE        (u32)(2  * LENU32)  // Filter Extended Element Size in bytes
@@ -139,23 +128,10 @@
 #define RAM_TFQSA 			(u32)(RAM_TEFSA + (RAM_TEF_ELM * RAM_TEF_SIZE)) 		// TX FIFO/Queue Start Address
 #define RAM_SIZE  			(u32)(RAM_TFQSA + (RAM_TFQ_ELM * RAM_TFQ_SIZE)) 		// Message RAM size
 
-/* RAM Arrays */
-#define RAM
-
-// MOVE OUT AFTER TESTING
-typedef struct {
-	u32 FLS[RAM_FLS_ELM * RAM_FLS_LEN];
-	u32 FLE[RAM_FLE_ELM * RAM_FLE_LEN];
-	u32 RF0[RAM_RF0_ELM * RAM_RF0_LEN];
-	u32 RF1[RAM_RF1_ELM * RAM_RF1_LEN];
-	u32 TEF[RAM_TEF_ELM * RAM_TEF_LEN];
-	u32 TFQ[RAM_TFQ_ELM * RAM_TFQ_LEN];
-} FDCANRAM_TypeDef;
-
 /* Private Functions */
 static inline void set_nominal_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 ts1, u32 brp, u32 sjw);
 static inline void set_databit_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 ts1, u32 brp, u32 sjw);
-static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRamAddress_TypeDef *ram, u32 ram_base);
+static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, u32 ram_base);
 static inline u32 calc_bytes(u32 dlc);
 
 /* NEED TO MOVE THESE UP TO MAKE GENERIC */
@@ -165,8 +141,8 @@ static inline u32 calc_bytes(u32 dlc);
 #define TS1                	11
 #define TS2                	4
 
-
-void fdcan_open(FDCAN_TypeDef *ptr) {
+// Open the driver
+void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base) {
 	set_ptr_vol_bit_u32(&ptr->CCCR, INIT);					// Initalize CAN
 	while (!get_ptr_vol_bit_u32(&ptr->CCCR, INIT));			// Wait For CAN Initialized
 	set_ptr_vol_bit_u32(&ptr->CCCR, CCE);					// Enable Configuration
@@ -184,8 +160,14 @@ void fdcan_open(FDCAN_TypeDef *ptr) {
 		CCCR.ASM  	|   0    |     1      |     0      |    0     |    0
 	*/
 	// Setup a section when wanting to test only
+	
+	set_ptr_vol_bit_u32(&ptr->CCCR, MON);
+	set_ptr_vol_bit_u32(&ptr->CCCR, TESTB);
+	set_ptr_vol_bit_u32(&ptr->TEST, LBCK);
 
 	set_nominal_timing_register(ptr, TS2, TS1, BRP, SJW);	// Set Timing for Standard CAN arbitration and bit rate
+
+	calculate_ram_addresses(ptr, ram_base);
 
 	clr_ptr_vol_bit_u32(&ptr->CCCR, INIT);					// Normal Operation
 	while (get_ptr_vol_bit_u32(&ptr->CCCR, INIT));			// Wait For Normal Operation
@@ -226,7 +208,7 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 			msg->DATA[(i * LENU32) + 3] = (reg >> 24) & MASK_8_BIT;
 		}
 		return true;
-	} else if (get_ptr_vol_u32(ptr->RXF1S, FxFL_OFFSET, FxFL_MASK) > 0U) {
+	} else if (get_ptr_vol_u32(&ptr->RXF1S, FxFL_OFFSET, FxFL_MASK) > 0U) {
 		ind = get_ptr_vol_u32(&ptr->RXF1S, FxGI_OFFSET, FxGI_MASK);
 		offset = ind * RAM_RF1_LEN;
 		msg->HEADER.reg = get_ptr_vol_raw_u32(&ram->RF1[offset]);
@@ -311,6 +293,13 @@ void fdcan_get_ir(FDCAN_TypeDef *ptr, u32 bit) {
 	get_ptr_vol_bit_u32(&ptr->IR, bit);
 }
 
+// Gets an error or status bit 
+void fdcan_set_ir(FDCANRAM_TypeDef *ptr, u32 ind, FDCANSTDFilter_TypeDef std) {
+	if (ind < RAM_FLS_ELM) {
+		set_ptr_vol_raw_u32(&ptr->FLS[ind], std.reg);
+	}
+}
+
 // Used For Arbitration for FDCAN and CAN and data rate timing in CAN
 static inline void set_nominal_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 ts1, u32 brp, u32 sjw) {
 	set_ptr_vol_u32(&ptr->NBTP, NTS2_OFFSET, NTS2_MASK, ts2 - 1);
@@ -328,17 +317,20 @@ static inline void set_databit_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 
 }
 
 // Calculates Base Addresses For Use In Read And Writing RAM
-static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRamAddress_TypeDef *ram, u32 ram_base) {
+static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, u32 ram_base) {
+//static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRamAddress_TypeDef *ram, u32 ram_base) {
 	// Standard Filter Elements and Extended Filter  
-	set_ptr_vol_u32(ptr->RXCFG, LSS_OFFSET, LSS_MASK, RAM_FLS_ELM);
-	set_ptr_vol_u32(ptr->RXCFG, LSE_OFFSET, LSE_MASK, RAM_FLE_ELM);
+	set_ptr_vol_u32(&ptr->RXCFG, LSS_OFFSET, LSS_MASK, RAM_FLS_ELM);
+	set_ptr_vol_u32(&ptr->RXCFG, LSE_OFFSET, LSE_MASK, RAM_FLE_ELM);
 
+	/*
 	ram->STDFilterSA = ram_base + RAM_FLSSA;		// Standard Filter Base Address
 	ram->EXTFilterSA = ram_base + RAM_FLESA;		// Extended Filter Base Address
 	ram->RXFIFO0SA = ram_base + RAM_RF0SA;			// RX FIFO 0 Base Address
 	ram->RXFIFO0SA = ram_base + RAM_RF1SA;			// RX FIFO 1 Base Address
 	ram->TXEventFIFOSA = ram_base + RAM_TEFSA;		// TX event FIFO Base Address
 	ram->TXFIFOQSA = ram_base + RAM_TFQSA;			// TX FIFO/Queue Base Address
+	*/
 
 	// Clear Ram Buffer 
 	for (u32 RAMcounter = ram_base; RAMcounter < (ram_base + RAM_SIZE); RAMcounter += LENU32) {
