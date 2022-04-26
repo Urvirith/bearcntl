@@ -86,7 +86,7 @@ typedef union {
 	u32 reg;
 	struct {
 		u32 SFID2	:11;			// Second ID Of Standard ID Filter Element
-		u32 		:5
+		u32 		:5;				// Reserved
 		u32 SFID1	:11;			// First ID Of Standard ID Filter Element
 		u32 SFEC	:3;				// Stamdard Filter Element Configuration, 000 Disable, 001 RX FIFO 0 On Filter Match, 010 RX FIFO 1 On Filter Match, 011 Reject ID on Match, 100 Set Priority If Filter Matches, 101 Set Priority and Store FIFO0, 110 Set Priority and Store FIFO1
 		u32 SFT		:2;				// Filter Type - 00 Range Filter SFID 1 - SFID 2, 01 Dual Range Filter SFID1 or SFID2, 10, Classic Filter - SFID1 = Filter SFID = Filter 2, 11, Filter Disabled
@@ -101,7 +101,7 @@ typedef union {
 		u32 STID	:11;			// Standard ID
 		u32 RTR		:1;				// Remote Transmission Request
 		u32 XTD		:1;				// Extended ID Flag: 0 - Std, 1 - Ext
-		u32 ESI		:1;				// CAN FD Format
+		u32 ESI		:1;				// Errpr State Indicator 0 - Node Is Error Active, 1- Node is Error Passive
 	} fields;
 	struct {
 		u32 ID		:29;			// Combined ID
@@ -190,5 +190,10 @@ typedef enum fdcan_wordlength {
 
 /* Public Functions */
 void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base);
+bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *msg);
+bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *msg);
+void fdcan_clr_ir(FDCAN_TypeDef *ptr, u32 bit);
+u32 fdcan_get_ir(FDCAN_TypeDef *ptr);
+void fdcan_set_fls(FDCANRAM_TypeDef *ptr, u32 ind, FDCANSTDFilter_TypeDef std);
 
 #endif /* FDCAN_H_ */

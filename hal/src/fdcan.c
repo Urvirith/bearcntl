@@ -31,7 +31,7 @@
 
 /* TXFQS */
 #define TFFL_MASK			MASK_3_BIT
-#define TFGI_MASK			MASK_2_BIT
+#define TFQPI_MASK			MASK_2_BIT
 
 /* Register Bits */
 /* TEST */
@@ -74,6 +74,9 @@
 #define MRAF				BIT_14
 #define TOO					BIT_15
 
+/* TXFQS */
+#define TFQF				BIT_21
+
 /* RXFxS */
 #define FxF					BIT_24
 #define RFxL				BIT_25
@@ -105,7 +108,7 @@
 
 /* TXFQS */
 #define TFFL_OFFSET			0
-#define TFGI_OFFSET			8
+#define TFQPI_OFFSET		16
 
 /* FDCAN RAM Declarations */
 #define LENU32				(u32)4				// Bytes In A u32 - Element Is Always 4 Bytes Long
@@ -136,10 +139,10 @@ static inline u32 calc_bytes(u32 dlc);
 
 /* NEED TO MOVE THESE UP TO MAKE GENERIC */
 /* CAN Speed Settings */
-#define SJW              	2
-#define BRP                 6
-#define TS1                	11
-#define TS2                	4
+#define SJW              	1
+#define BRP                 3
+#define TS1                	13
+#define TS2                	2
 
 // Open the driver
 void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base) {
@@ -247,11 +250,11 @@ bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *
 	u32 elm = 0;
 	u32 bytes = 0; 
 	
-	if (get_ptr_vol_u32(&ptr->TXFQS, TFFL_OFFSET, TFFL_MASK) >= RAM_TFQ_ELM) { // TX FIFO Full, Return
+	if (!get_ptr_vol_bit_u32(&ptr->TXFQS, TFQF)) { // TX FIFO Full, Return
 		return false;
 	}
 
-	ind = get_ptr_vol_u32(&ptr->TXFQS, TFGI_OFFSET, TFGI_MASK);
+	ind = get_ptr_vol_u32(&ptr->TXFQS, TFQPI_OFFSET, TFQPI_MASK);
 	offset = ind * RAM_TFQ_LEN;
 	set_ptr_vol_raw_u32(&ram->TFQ[offset], msg->HEADER.reg);
 	offset += 1;
@@ -289,12 +292,12 @@ void fdcan_clr_ir(FDCAN_TypeDef *ptr, u32 bit) {
 }
 
 // Gets an error or status bit 
-void fdcan_get_ir(FDCAN_TypeDef *ptr, u32 bit) {
-	get_ptr_vol_bit_u32(&ptr->IR, bit);
+u32 fdcan_get_ir(FDCAN_TypeDef *ptr) {
+	return get_ptr_vol_raw_u32(&ptr->IR);
 }
 
 // Gets an error or status bit 
-void fdcan_set_ir(FDCANRAM_TypeDef *ptr, u32 ind, FDCANSTDFilter_TypeDef std) {
+void fdcan_set_fls(FDCANRAM_TypeDef *ptr, u32 ind, FDCANSTDFilter_TypeDef std) {
 	if (ind < RAM_FLS_ELM) {
 		set_ptr_vol_raw_u32(&ptr->FLS[ind], std.reg);
 	}

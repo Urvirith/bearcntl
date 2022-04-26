@@ -47,7 +47,8 @@ OBJS 		:=	$(OBJ_DIR)/main.o \
 				$(OBJ_DIR)/rcc.o \
 				$(OBJ_DIR)/gpio.o \
 				$(OBJ_DIR)/timer.o \
-				$(OBJ_DIR)/fdcan.o
+				$(OBJ_DIR)/fdcan.o \
+				$(OBJ_DIR)/usart.o
 #	EXAMPLE OF AUTOMATIC VARIABLES
 #	%.o: %.c %.h common.h
 #		$(CC) $(CFLAGS) -c $<
@@ -72,7 +73,7 @@ $(BIN_DIR)/main.bin: $(BIN_DIR)/main.elf
 
 # Build An ELF 
 $(BIN_DIR)/main.elf: $(LINK_DIR)/$(LINKER) $(OBJS) $(BIN_DIR)/startup.o
-	$(LD) $(OPTFLAGS) -s $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) -T $^ -o $@ -nostartfiles
 
 # Build Dependances
 $(BIN_DIR)/startup.o: $(START_DIR)/$(STARTUP)

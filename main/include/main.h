@@ -8,5 +8,6 @@
 #include "gpio.h"
 #include "timer.h"
 #include "fdcan.h"
+#include "usart.h"
 
 #endif /* MAIN_H_ */
