@@ -183,7 +183,7 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 	u32 elm = 0;
 	u32 bytes = 0; 
 
-	if (get_ptr_vol_u32(&ptr->RXF0S, FxFL_OFFSET, FxFL_MASK) > 0U) {
+	if (get_ptr_vol_u32(&ptr->RXF0S, FxFL_OFFSET, FxFL_MASK) != 0U) {
 		ind = get_ptr_vol_u32(&ptr->RXF0S, FxGI_OFFSET, FxGI_MASK);
 		offset = ind * RAM_RF0_LEN;
 		msg->HEADER.reg = get_ptr_vol_raw_u32(&ram->RF0[offset]);
@@ -203,15 +203,17 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 			if ((i + offset) >= ((ind * RAM_RF0_LEN) + RAM_RF0_LEN)) { 
 				return false;
 			}
-
+			
 			reg = get_ptr_vol_raw_u32(&ram->RF0[i + offset]);
 			msg->DATA[(i * LENU32) + 0] = (reg >> 0) & MASK_8_BIT;
 			msg->DATA[(i * LENU32) + 1] = (reg >> 8) & MASK_8_BIT;
 			msg->DATA[(i * LENU32) + 2] = (reg >> 16) & MASK_8_BIT;
 			msg->DATA[(i * LENU32) + 3] = (reg >> 24) & MASK_8_BIT;
 		}
+
+		set_ptr_vol_raw_u32(&ptr->RXF0A, ind);
 		return true;
-	} else if (get_ptr_vol_u32(&ptr->RXF1S, FxFL_OFFSET, FxFL_MASK) > 0U) {
+	} else if (get_ptr_vol_u32(&ptr->RXF1S, FxFL_OFFSET, FxFL_MASK) != 0U) {
 		ind = get_ptr_vol_u32(&ptr->RXF1S, FxGI_OFFSET, FxGI_MASK);
 		offset = ind * RAM_RF1_LEN;
 		msg->HEADER.reg = get_ptr_vol_raw_u32(&ram->RF1[offset]);
@@ -237,6 +239,8 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 			msg->DATA[(i * LENU32) + 2] = (u8)((reg >> 16) & MASK_8_BIT);
 			msg->DATA[(i * LENU32) + 3] = (u8)((reg >> 24) & MASK_8_BIT);
 		}
+
+		set_ptr_vol_raw_u32(&ptr->RXF1A, ind);
 		return true;
 	} else {
 		return false;
@@ -250,7 +254,7 @@ bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *
 	u32 elm = 0;
 	u32 bytes = 0; 
 	
-	if (!get_ptr_vol_bit_u32(&ptr->TXFQS, TFQF)) { // TX FIFO Full, Return
+	if (get_ptr_vol_bit_u32(&ptr->TXFQS, TFQF)) { // TX FIFO Full, Return
 		return false;
 	}
 
@@ -274,10 +278,10 @@ bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *
 			return false;
 		}
 
-		reg |= (u32)(msg->DATA[(i * LENU32) + 0]) << 0;
-		reg |= (u32)(msg->DATA[(i * LENU32) + 1]) << 8;
-		reg |= (u32)(msg->DATA[(i * LENU32) + 2]) << 16;
-		reg |= (u32)(msg->DATA[(i * LENU32) + 3]) << 24;
+		reg = ((((u32)(msg->DATA[(i * LENU32) + 0])) & MASK_8_BIT) << 0);
+		reg |= ((((u32)(msg->DATA[(i * LENU32) + 1])) & MASK_8_BIT) << 8);
+		reg |= ((((u32)(msg->DATA[(i * LENU32) + 2])) & MASK_8_BIT) << 16);
+		reg |= ((((u32)(msg->DATA[(i * LENU32) + 3])) & MASK_8_BIT) << 24);
 		set_ptr_vol_raw_u32(&ram->TFQ[i + offset], reg);
 	}
 
@@ -288,7 +292,7 @@ bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *
 
 // Clears an error or status bit
 void fdcan_clr_ir(FDCAN_TypeDef *ptr, u32 bit) {
-	set_ptr_vol_bit_u32(&ptr->IR, bit);
+	set_ptr_vol_raw_u32(&ptr->IR, bit);
 }
 
 // Gets an error or status bit 
@@ -336,8 +340,8 @@ static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, u32 ram_base) {
 	*/
 
 	// Clear Ram Buffer 
-	for (u32 RAMcounter = ram_base; RAMcounter < (ram_base + RAM_SIZE); RAMcounter += LENU32) {
-		*(volatile u32*)(RAMcounter) = (u32)0x00000000;
+	for (volatile u32* RAMcounter = (volatile u32*)ram_base; RAMcounter < (volatile u32*)(ram_base + RAM_SIZE); RAMcounter++) {
+		*RAMcounter = (u32)0x00000000;
 	}
 }
 
@@ -380,5 +384,7 @@ static inline u32 calc_bytes(u32 dlc) {
 			return 48;
 		case 15:
 			return 64;
+		default:
+			return 8;
 	}
 }

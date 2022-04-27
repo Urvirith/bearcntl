@@ -67,12 +67,12 @@
 #define NVIC_BASE                   ((u32)0xE000E100)
 
 /* Reset and Clock Control (RCC) */
-#define RCC_GPIOA_AHB2EN            BIT_0                               /* GPIOA Enable is located on AHB2 Board Bit 0 */
-#define RCC_GPIOB_AHB2EN            BIT_1                               /* GPIOB Enable is located on AHB2 Board Bit 1 */
-#define RCC_GPIOC_AHB2EN            BIT_2                               /* GPIOC Enable is located on AHB2 Board Bit 2 */
-#define RCC_GPIOD_AHB2EN            BIT_3                               /* GPIOD Enable is located on AHB2 Board Bit 3 */
-#define RCC_GPIOE_AHB2EN            BIT_4                               /* GPIOE Enable is located on AHB2 Board Bit 4 */
-#define RCC_GPIOF_AHB2EN            BIT_5                               /* GPIOE Enable is located on AHB2 Board Bit 4 */
+#define RCC_GPIOA_AHB2ENR           BIT_0                               /* GPIOA Enable is located on AHB2 Board Bit 0 */
+#define RCC_GPIOB_AHB2ENR           BIT_1                               /* GPIOB Enable is located on AHB2 Board Bit 1 */
+#define RCC_GPIOC_AHB2ENR           BIT_2                               /* GPIOC Enable is located on AHB2 Board Bit 2 */
+#define RCC_GPIOD_AHB2ENR           BIT_3                               /* GPIOD Enable is located on AHB2 Board Bit 3 */
+#define RCC_GPIOE_AHB2ENR           BIT_4                               /* GPIOE Enable is located on AHB2 Board Bit 4 */
+#define RCC_GPIOF_AHB2ENR           BIT_5                               /* GPIOE Enable is located on AHB2 Board Bit 4 */
 
 /* General Purpose I/O */
 /* NUCLEO BOARD PIN OUT SPECIFICS - NUCLEO - L552ZE-Q */
@@ -121,12 +121,12 @@
 #define TIM3_PWM4_AF                AF2                                 /* PWM TIMER 3 on GPIO E Bus, Pin 6   */
 
 /* Timer */
-#define RCC_TIMER2_APB1R1EN         BIT_0
-#define RCC_TIMER3_APB1R1EN         BIT_1
-#define RCC_TIMER4_APB1R1EN         BIT_2
+#define RCC_TIMER2_APB1ENR1         BIT_0
+#define RCC_TIMER3_APB1ENR1         BIT_1
+#define RCC_TIMER4_APB1ENR1         BIT_2
 
 /* USART (Universal Synchronous and Asynchronous Receiver Transmitter) */
-#define RCC_USART3_APB1R1EN         BIT_18
+#define RCC_USART3_APB1ENR1         BIT_18
 #define GPIOD_PIN8                  (u32)8                              /* GPIO Bus D Pin 8 TX - D1   */
 #define GPIOD_PIN9                  (u32)9                              /* GPIO Bus D Pin 9 RX - D0   */
 #define USART3_TX                   GPIOD_PIN8
@@ -140,7 +140,7 @@
 /* SPI (Serial Peripheral Interface) */
 /* SPI 1*/
 /* RCC */
-#define RCC_SPI1_APB2REN            BIT_12
+#define RCC_SPI1_APB2ENR            BIT_12
 #define GPIOB_PIN4                  (u32)4                              /* GPIO Bus B Pin 4 MISO  */
 #define GPIOB_PIN5                  (u32)5                              /* GPIO Bus B Pin 5 MOSI  */
 #define GPIOB_PIN3                  (u32)3                              /* GPIO Bus B Pin 3 SCK   */
@@ -158,7 +158,7 @@
 #define SPI_AF                      AF5
 
 /* FDCAN */
-#define RCC_FDCAN_APB1_ENR2         BIT_9
+#define RCC_FDCAN_APB1ENR2          BIT_9
 #define RCC_FDCAN_CCIPR1_PLLQCLK    BIT_24                              /* RCC CCIPR1 PLLQCLK  */
 #define GPIOD_PIN0                  (u32)0                              /* GPIO Bus D Pin 0 CAN RX */
 #define GPIOD_PIN1                  (u32)1                              /* GPIO Bus D Pin 1 CAN TX */

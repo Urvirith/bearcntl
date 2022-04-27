@@ -53,11 +53,12 @@ typedef struct {
 	volatile u32   	RXCFG; 	    	// Global Filter Configuration Register
 	volatile u32   	XIDAM; 	    	// Extended ID and Mask Register
 	volatile u32   	HPMS; 	    	// High Priority Message Status Register
+	volatile u32   	Reserved4;		// RESERVED
 	volatile u32   	RXF0S; 	    	// RX FIFO Status Register
 	volatile u32   	RXF0A; 	    	// RX FIFO Acknowledge Register
 	volatile u32   	RXF1S; 	    	// RX FIFO Status Register
 	volatile u32   	RXF1A; 	    	// RX FIFO Acknowledge Register
-	volatile u32   	Reserved4[8];	// RESERVED
+	volatile u32   	Reserved5[8];	// RESERVED
 	volatile u32   	TXBC; 	    	// TX Buffer Configuration Register
 	volatile u32   	TXFQS; 	    	// TX FIFO Queue Status Register
 	volatile u32   	TXBRP; 	    	// TX Buffer Request Pending Register
