@@ -53,18 +53,18 @@ extern void main() {
     timer_start(TIMER2);
 
     // Start FDCAN
-    fdcan_open(FDCAN, FDCAN_RAM_BASE);
+    fdcan_open(FDCAN, FDCAN_RAM);
     usart_open(USART3, USART_8_Bits, USART_1_StopBit, USART_921600_BAUD, 32000, USART_Oversample_16);
 
     FDCANSTDFilter_TypeDef std;
-    std.fields.SFID1 = 0;
-    std.fields.SFID2 = 1;
+    std.fields.SFID1 = 1;
+    std.fields.SFID2 = 2;
     std.fields.SFEC = 1;
     std.fields.SFT = 0;
 
     FDCANMsgTX_TypeDef fdcantx;
     fdcantx.HEADER.reg = 0;
-    fdcantx.HEADER.fields.STID = 1;
+    fdcantx.HEADER.fields.STID = 5;
     fdcantx.HEADER.fields.XTD = 0;
     fdcantx.HEADER.fields.ESI = 0;
     fdcantx.TX.reg = 0;

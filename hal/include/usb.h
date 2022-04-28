@@ -23,9 +23,9 @@ typedef struct {
 } USB_TypeDef;
 
 typedef struct {
-	volatile u16   ADDR_TX;			// Transmission Buffer Address Register
+	volatile u8    ADDR_TX;			// Transmission Buffer Address Register
 	volatile u16   COUNT_TX;		// Transmission Byte Count Register
-	volatile u16   ADDR_RX;			// Reception Buffer Address Register
+	volatile u8    ADDR_RX;			// Reception Buffer Address Register
 	volatile u16   COUNT_RX;		// Reception Byte Count Register
 } USBData_TypeDef;
 

@@ -190,7 +190,7 @@ typedef enum fdcan_wordlength {
 } FDCAN_WordLength;
 
 /* Public Functions */
-void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base);
+void fdcan_open(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram);
 bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *msg);
 bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *msg);
 void fdcan_clr_ir(FDCAN_TypeDef *ptr, u32 bit);

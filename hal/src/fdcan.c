@@ -112,30 +112,11 @@
 
 /* FDCAN RAM Declarations */
 #define LENU32				(u32)4				// Bytes In A u32 - Element Is Always 4 Bytes Long
-
-/* RAM Setup */
-/* RAM Length Of Elements Per Byte */
-#define RAM_FLS_SIZE        (u32)(1  * LENU32)  // Filter Standard Element Size in bytes
-#define RAM_FLE_SIZE        (u32)(2  * LENU32)  // Filter Extended Element Size in bytes
-#define RAM_RF0_SIZE        (u32)(18 * LENU32)  // RX FIFO 0 Elements Size in bytes
-#define RAM_RF1_SIZE        (u32)(18 * LENU32)  // RX FIFO 1 Elements Size in bytes
-#define RAM_TEF_SIZE        (u32)(2  * LENU32)  // TX Event FIFO Elements Size in bytes
-#define RAM_TFQ_SIZE        (u32)(18 * LENU32)  // TX FIFO/Queue Elements Size in bytes
-
-/* RAM Start Addresses */
-#define RAM_FLSSA 			(u32)0                                          	// Filter List Standard Start Address
-#define RAM_FLESA 			(u32)(RAM_FLSSA + (RAM_FLS_ELM * RAM_FLS_SIZE)) 		// Filter List Extended Start Address
-#define RAM_RF0SA 			(u32)(RAM_FLESA + (RAM_FLE_ELM * RAM_FLE_SIZE)) 		// RX FIFO 0 Start Address
-#define RAM_RF1SA 			(u32)(RAM_RF0SA + (RAM_RF0_ELM * RAM_RF0_SIZE)) 		// RX FIFO 1 Start Address
-#define RAM_TEFSA 			(u32)(RAM_RF1SA + (RAM_RF1_ELM * RAM_RF1_SIZE)) 		// TX Event FIFO Start Address
-#define RAM_TFQSA 			(u32)(RAM_TEFSA + (RAM_TEF_ELM * RAM_TEF_SIZE)) 		// TX FIFO/Queue Start Address
-#define RAM_SIZE  			(u32)(RAM_TFQSA + (RAM_TFQ_ELM * RAM_TFQ_SIZE)) 		// Message RAM size
-
+#define HEADER_LEN        	(u32)2  			// Header Length
 /* Private Functions */
 static inline void set_nominal_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 ts1, u32 brp, u32 sjw);
 static inline void set_databit_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 ts1, u32 brp, u32 sjw);
-static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, u32 ram_base);
-static inline u32 calc_bytes(u32 dlc);
+static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram);
 
 /* NEED TO MOVE THESE UP TO MAKE GENERIC */
 /* CAN Speed Settings */
@@ -145,7 +126,7 @@ static inline u32 calc_bytes(u32 dlc);
 #define TS2                	2
 
 // Open the driver
-void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base) {
+void fdcan_open(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram) {
 	set_ptr_vol_bit_u32(&ptr->CCCR, INIT);					// Initalize CAN
 	while (!get_ptr_vol_bit_u32(&ptr->CCCR, INIT));			// Wait For CAN Initialized
 	set_ptr_vol_bit_u32(&ptr->CCCR, CCE);					// Enable Configuration
@@ -170,7 +151,7 @@ void fdcan_open(FDCAN_TypeDef *ptr, u32 ram_base) {
 
 	set_nominal_timing_register(ptr, TS2, TS1, BRP, SJW);	// Set Timing for Standard CAN arbitration and bit rate
 
-	calculate_ram_addresses(ptr, ram_base);
+	calculate_ram_addresses(ptr, ram);
 
 	clr_ptr_vol_bit_u32(&ptr->CCCR, INIT);					// Normal Operation
 	while (get_ptr_vol_bit_u32(&ptr->CCCR, INIT));			// Wait For Normal Operation
@@ -180,26 +161,18 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 	u32 ind = 0;	// Index Fetched
 	u32 offset = 0;
 	u32 reg = 0;
-	u32 elm = 0;
-	u32 bytes = 0; 
+	u32 end = 0; 
 
 	if (get_ptr_vol_u32(&ptr->RXF0S, FxFL_OFFSET, FxFL_MASK) != 0U) {
+		end = (RAM_RF0_LEN - HEADER_LEN);
 		ind = get_ptr_vol_u32(&ptr->RXF0S, FxGI_OFFSET, FxGI_MASK);
 		offset = ind * RAM_RF0_LEN;
 		msg->HEADER.reg = get_ptr_vol_raw_u32(&ram->RF0[offset]);
 		offset += 1;
 		msg->RX.reg = get_ptr_vol_raw_u32(&ram->RF0[offset]);
 		offset += 1;
-		bytes = calc_bytes(msg->RX.fields.DLC); // Get the number of bytes transfered
 
-		// Verify the number of elements in system
-		if ((bytes % 4) == 0) {
-			elm = bytes / LENU32;
-		} else {
-			elm = (bytes / LENU32) + 1;
-		}
-
-		for (u32 i = 0; i < elm; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
+		for (u32 i = 0; i < end; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
 			if ((i + offset) >= ((ind * RAM_RF0_LEN) + RAM_RF0_LEN)) { 
 				return false;
 			}
@@ -214,21 +187,15 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 		set_ptr_vol_raw_u32(&ptr->RXF0A, ind);
 		return true;
 	} else if (get_ptr_vol_u32(&ptr->RXF1S, FxFL_OFFSET, FxFL_MASK) != 0U) {
+		end = (RAM_RF1_LEN - HEADER_LEN);
 		ind = get_ptr_vol_u32(&ptr->RXF1S, FxGI_OFFSET, FxGI_MASK);
 		offset = ind * RAM_RF1_LEN;
 		msg->HEADER.reg = get_ptr_vol_raw_u32(&ram->RF1[offset]);
 		offset += 1;
 		msg->RX.reg = get_ptr_vol_raw_u32(&ram->RF1[offset]);
 		offset += 1;
-		bytes = calc_bytes(msg->RX.fields.DLC); // Get the number of bytes transfered
 
-		// Verify the number of elements in system
-		if ((bytes % 4) == 0) {
-			elm = bytes / LENU32;
-		} else {
-			elm = (bytes / LENU32) + 1;
-		}
-		for (u32 i = 0; i < elm; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
+		for (u32 i = 0; i < end; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
 			if ((i + offset) >= ((ind * RAM_RF1_LEN) + RAM_RF1_LEN)) { 
 				return false;
 			}
@@ -250,9 +217,7 @@ bool fdcan_read(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgRX_TypeDef *m
 bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *msg) {
 	u32 ind = 0;	// Index Fetched
 	u32 offset = 0;
-	u32 reg = 0;
-	u32 elm = 0;
-	u32 bytes = 0; 
+	u32 end = (RAM_TFQ_LEN - HEADER_LEN);
 	
 	if (get_ptr_vol_bit_u32(&ptr->TXFQS, TFQF)) { // TX FIFO Full, Return
 		return false;
@@ -264,25 +229,18 @@ bool fdcan_write(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram, FDCANMsgTX_TypeDef *
 	offset += 1;
 	set_ptr_vol_raw_u32(&ram->TFQ[offset], msg->TX.reg);
 	offset += 1;
-	bytes = calc_bytes(msg->TX.fields.DLC); // Get the number of bytes transfered
 
-	// Verify the number of elements in system
-	if ((bytes % 4) == 0) {
-		elm = bytes / LENU32;
-	} else {
-		elm = (bytes / LENU32) + 1;
-	}
-
-	for (u32 i = 0; i < elm; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
+	for (u32 i = 0; i < end; i++) {  // NEED TO CHANGE TO MODULUS TO ROUND OUT DATA
 		if ((i + offset) >= ((ind * RAM_TFQ_LEN) + RAM_TFQ_LEN)) { 
 			return false;
 		}
 
-		reg = ((((u32)(msg->DATA[(i * LENU32) + 0])) & MASK_8_BIT) << 0);
-		reg |= ((((u32)(msg->DATA[(i * LENU32) + 1])) & MASK_8_BIT) << 8);
-		reg |= ((((u32)(msg->DATA[(i * LENU32) + 2])) & MASK_8_BIT) << 16);
-		reg |= ((((u32)(msg->DATA[(i * LENU32) + 3])) & MASK_8_BIT) << 24);
-		set_ptr_vol_raw_u32(&ram->TFQ[i + offset], reg);
+		set_ptr_vol_raw_u32(&ram->TFQ[i + offset], 
+			((((u32)(msg->DATA[(i * LENU32) + 0])) & MASK_8_BIT) << 0)  |
+			((((u32)(msg->DATA[(i * LENU32) + 1])) & MASK_8_BIT) << 8)  |
+			((((u32)(msg->DATA[(i * LENU32) + 2])) & MASK_8_BIT) << 16) |
+			((((u32)(msg->DATA[(i * LENU32) + 3])) & MASK_8_BIT) << 24)
+		);
 	}
 
 	set_ptr_vol_bit_u32(&ptr->TXBAR, 1 << ind);
@@ -324,67 +282,33 @@ static inline void set_databit_timing_register(FDCAN_TypeDef *ptr, u32 ts2, u32 
 }
 
 // Calculates Base Addresses For Use In Read And Writing RAM
-static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, u32 ram_base) {
-//static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRamAddress_TypeDef *ram, u32 ram_base) {
+static inline void calculate_ram_addresses(FDCAN_TypeDef *ptr, FDCANRAM_TypeDef *ram) {
 	// Standard Filter Elements and Extended Filter  
 	set_ptr_vol_u32(&ptr->RXCFG, LSS_OFFSET, LSS_MASK, RAM_FLS_ELM);
 	set_ptr_vol_u32(&ptr->RXCFG, LSE_OFFSET, LSE_MASK, RAM_FLE_ELM);
 
-	/*
-	ram->STDFilterSA = ram_base + RAM_FLSSA;		// Standard Filter Base Address
-	ram->EXTFilterSA = ram_base + RAM_FLESA;		// Extended Filter Base Address
-	ram->RXFIFO0SA = ram_base + RAM_RF0SA;			// RX FIFO 0 Base Address
-	ram->RXFIFO0SA = ram_base + RAM_RF1SA;			// RX FIFO 1 Base Address
-	ram->TXEventFIFOSA = ram_base + RAM_TEFSA;		// TX event FIFO Base Address
-	ram->TXFIFOQSA = ram_base + RAM_TFQSA;			// TX FIFO/Queue Base Address
-	*/
-
 	// Clear Ram Buffer 
-	for (volatile u32* RAMcounter = (volatile u32*)ram_base; RAMcounter < (volatile u32*)(ram_base + RAM_SIZE); RAMcounter++) {
-		*RAMcounter = (u32)0x00000000;
+	for (u32 i = 0; i < (RAM_FLS_ELM * RAM_FLS_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->FLS[i], 0);
 	}
-}
 
-/* 
-	Data Length Code: 
-	Classic CAN 0 - 8 Data Bytes 
-	FDCAN 9 - 15 = 12/16/20/24/32/48/64 Data Bytes
-*/
-static inline u32 calc_bytes(u32 dlc) {
-	switch(dlc) {
-		case 0:
-			return 0;
-		case 1:
-			return 1;
-		case 2:
-			return 2;
-		case 3:
-			return 3;
-		case 4:
-			return 4;
-		case 5:
-			return 5;
-		case 6:
-			return 6;
-		case 7:
-			return 7;
-		case 8:
-			return 8;
-		case 9:
-			return 12;
-		case 10:
-			return 16;
-		case 11:
-			return 20;
-		case 12:
-			return 24;
-		case 13:
-			return 32;
-		case 14:
-			return 48;
-		case 15:
-			return 64;
-		default:
-			return 8;
+	for (u32 i = 0; i < (RAM_FLE_ELM * RAM_FLE_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->FLE[i], 0);
+	}
+
+	for (u32 i = 0; i < (RAM_RF0_ELM * RAM_RF0_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->RF0[i], 0);
+	}
+
+	for (u32 i = 0; i < (RAM_RF1_ELM * RAM_RF1_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->RF1[i], 0);
+	}
+
+	for (u32 i = 0; i < (RAM_TEF_ELM * RAM_TEF_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->TEF[i], 0);
+	}
+
+	for (u32 i = 0; i < (RAM_TFQ_ELM * RAM_TFQ_LEN); i++) {
+		set_ptr_vol_raw_u32(&ram->TFQ[i], 0);
 	}
 }
